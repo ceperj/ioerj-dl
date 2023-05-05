@@ -1,4 +1,4 @@
-import ioerj_dl
+import cli
   
 
-ioerj_dl.main()
+cli.main()
