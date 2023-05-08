@@ -14,22 +14,19 @@ def main():
   #app = Application(key_bindings=kb, full_screen=True)
   #app.run()
 
-  # usa diretório Documentos padrão no Windows ou Linux
-  defaultDocs = "%s\\%s"%((os.environ['USERPROFILE'] or os.environ['HOME']), 'Documents\\IOERJ')
-
   tipoDownload = button_dialog(
-    title='Selecione o periodo a ser baixado',
-    text='Último DO ou multiplos DOs',
+    title= 'Selecione o periodo a ser baixado',
+    text = 'Último DO ou multiplos DOs',
     buttons=[
         ('Hoje', 'hoje'),
         ('Período', 'periodo'),
     ]).run()
   
   diretorio = input_dialog(
-    title='Diretório de destino dos arquivos de DO',
-    text='Navegar com setas e enter (padrão: pasta Documentos)',
-    cancel_text='Cancelar',
-    default=defaultDocs).run()
+    title = 'Diretório de destino dos arquivos de DO',
+    text =  'Navegar com setas e enter (padrão: pasta Documentos)',
+    cancel_text = 'Cancelar',
+    default = str(gl.defaultDir)).run()
   
   cad = []
   for caderno in gl.cadernosDisponiveis:

@@ -1,10 +1,14 @@
 from bs4 import BeautifulSoup
-import requests, re, os
+from pathlib import Path
+import requests, re
 import datetime as dt
-from tqdm import tqdm
+# módulo tqdm para barra de progresso não é obrigatório
+try: from tqdm import tqdm
+except ImportError: tqdm = None
 
 ################################# VARIAVEIS GLOBAIS ###################################
 class Globals():
+  # nome de meses e respectivos números para serem parseados. Modulo Datetime não suporta português
   meses = {'Janeiro': 1,
           'Fevereiro': 2,
           'Março': 3,
@@ -24,6 +28,9 @@ class Globals():
   headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0' }
   cadernosDisponiveis = ['Parte I (Poder Executivo)', 'Parte IB - (Tribunal de Contas)', 'Parte II (Poder Legislativo)', 'Parte IV (Municipalidades)', 'Parte V (Publicações a Pedido)']
   hoje = dt.date.today()
+  
+  # pasta padrão para salvar arquivos
+  defaultDir = Path(Path.home(), 'Documents', 'IOERJ')
 
 gl = Globals()
 
@@ -45,26 +52,32 @@ def defSoup(url, parser='html.parser'):
 
 def savePdf(urlPdf, conf):
   
-  fullDir = "%s/%s/%s" %(conf.workDir, conf.dataAtual.year, conf.dataAtual.month)
-  os.makedirs(fullDir, exist_ok=True)
-  nomeFull = "%s/%s_%s.pdf" %(fullDir, conf.dataAtual.day, conf.caderno)
+  # diretório em que o pdf será salvo. Criar caso não exista
+  fullDir = Path(conf.workDir, str(conf.dataAtual.year), str(conf.dataAtual.month))
+  Path.mkdir(fullDir, exist_ok=True, parents=True)
+  # Nome completo do arquivo
+  nomeFull = Path(fullDir, '%s_%s.pdf'%(conf.dataAtual.day, conf.caderno))
 
   # download do pdf completo do caderno
   print('Baixando %s'%nomeFull)
   res = requests.get(urlPdf, stream=True, headers=gl.headers)
-  # cabeçalho da requisição para obter tamanho do arquivo e prever na barra de progresso
-  tamanhoArq = int(res.headers.get('Content-Length', 0))
-  
-  # escreve DO na pasta definida, com barra de progresso
+
+  # escreve DO na pasta definida
   with open(nomeFull, 'wb') as f:
-    for chunk in tqdm(res.iter_content(32*1024), total=tamanhoArq, unit='B', unit_scale=True):
-      if chunk:
-        f.write(chunk)
+    # usa barra de progresso caso o módulo esteja disponível
+    if tqdm:
+      # cabeçalho da requisição para obter tamanho do arquivo e prever na barra de progresso
+      tamanhoArq = int(res.headers.get('Content-Length', 0))
+      for chunk in tqdm(res.iter_content(32*1024), total=tamanhoArq, unit='B', unit_scale=True):
+        if chunk:
+          f.write(chunk)
     
+    else:
+      f.write(res.content)
 
   # escreve uma cópia extra para DO de hoje
   if conf.tipoDownload == 'hoje':
-    nomeFull = "%s/Hoje_%s.pdf" % (conf['workDir'], conf['caderno'])
+    nomeFull = Path(conf['workDir'], 'Hoje_%s.pdf'%conf['caderno'])
     with open(nomeFull, 'wb') as f:
       f.write(res.content)
 
@@ -210,7 +223,7 @@ class Conf():
     self.tipoDownload = tipoDownload or'periodo'
 
     # diretório para salvar pastas (padrão: pasta atual do __main__ ./ )
-    self.workDir = workDir or './'
+    self.workDir = workDir or gl.defaultDir
 
     #self.cadernosDisponiveis = ['Parte I (Poder Executivo)', 'Parte IB - (Tribunal de Contas)', 'Parte II (Poder Legislativo)', 'Parte IV (Municipalidades)', 'Parte V (Publicações a Pedido)']
     self.cadernos = cadernos or ['Parte I (Poder Executivo)']
