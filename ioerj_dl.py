@@ -1,8 +1,6 @@
 from bs4 import BeautifulSoup
 import requests, re, os
 import datetime as dt
-from prompt_toolkit.shortcuts import button_dialog, input_dialog, checkboxlist_dialog
-from prompt_toolkit.key_binding import KeyBindings
 from tqdm import tqdm
 
 ################################# VARIAVEIS GLOBAIS ###################################
@@ -52,7 +50,7 @@ def savePdf(urlPdf, conf):
   nomeFull = "%s/%s_%s.pdf" %(fullDir, conf.dataAtual.day, conf.caderno)
 
   # download do pdf completo do caderno
-  print('Baixando ', nomeFull)
+  print('Baixando %s'%nomeFull)
   res = requests.get(urlPdf, stream=True, headers=gl.headers)
   # cabeçalho da requisição para obter tamanho do arquivo e prever na barra de progresso
   tamanhoArq = int(res.headers.get('Content-Length', 0))
@@ -204,7 +202,7 @@ def executarDO(conf, dataInicio=(gl.hoje - dt.timedelta(days=7)), dataFim=gl.hoj
 
 
 ############################################## DEFINIÇÕES ######################################################
-#import ioerj_conf
+
 class Conf():
   def __init__(self, tipoDownload, workDir, cadernos, docs = None):
 
