@@ -15,7 +15,7 @@ def main():
   #app.run()
 
   # usa diretório Documentos padrão no Windows ou Linux
-  defaultDocs = "%s\\%s"%((os.environ['USERPROFILE'] or os.environ['HOME']), 'Documents')
+  defaultDocs = "%s\\%s"%((os.environ['USERPROFILE'] or os.environ['HOME']), 'Documents\\IOERJ')
 
   tipoDownload = button_dialog(
     title='Selecione o periodo a ser baixado',
