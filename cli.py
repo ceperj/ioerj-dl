@@ -1,18 +1,9 @@
-import os, ioerj_dl as id, datetime as dt
+import ioerj_dl as id, datetime as dt
 from prompt_toolkit.shortcuts import button_dialog, input_dialog, checkboxlist_dialog
-from prompt_toolkit.key_binding import KeyBindings
 
 gl = id.Globals()
 
 def main():
-  
-  #kb = KeyBindings()
-  #@kb.add('escape')
-  #def exit_(event):
-    #event.app.exit()
-  
-  #app = Application(key_bindings=kb, full_screen=True)
-  #app.run()
 
   tipoDownload = button_dialog(
     title= 'Selecione o periodo a ser baixado',
@@ -28,12 +19,11 @@ def main():
     cancel_text = 'Cancelar',
     default = str(gl.defaultDir)).run()
   
-  cad = []
-  for caderno in gl.cadernosDisponiveis:
-    cad.append((caderno, caderno))
+  cad = [(c, c) for c in gl.cadernosDisponiveis]
   cadernos = checkboxlist_dialog(
     title = "Cadernos para serem baixados",
     text = "Navegar com setas, selecionar com espaço/Enter, confirmar com Tab",
+    cancel_text='Cancelar',
     values = cad).run()
   
   if tipoDownload == 'periodo':
@@ -50,7 +40,8 @@ def main():
       ok_text="Começar",
       cancel_text="Cancelar" ).run()
 
-  conf = id.Conf(tipoDownload, diretorio, cadernos)
+    conf = id.Conf(tipoDownload, diretorio, cadernos)
 
-  fData = lambda x: dt.date(int(x.split('/')[2]), int(x.split('/')[1]), int(x.split('/')[0])) or None
-  id.executarDO(conf, dataInicio = fData(inicio), dataFim = fData(fim))
+    fData = lambda x: dt.date(int(x.split('/')[2]), int(x.split('/')[1]), int(x.split('/')[0])) or None
+    id.executarDO(conf, dataInicio = fData(inicio), dataFim = fData(fim))
+  
