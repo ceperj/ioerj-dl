@@ -204,9 +204,7 @@ def executarDO(conf, dataInicio=(gl.hoje - dt.timedelta(days=7)), dataFim=gl.hoj
 ############################################## DEFINIÇÕES ######################################################
 
 class Conf():
-  def __init__(self, tipoDownload, workDir, cadernos, docs = None):
-
-    self.docsDir = docs or os.environ['HOME']
+  def __init__(self, tipoDownload, workDir, cadernos):
     
     # dataDownload = ['hoje', 'periodo']
     self.tipoDownload = tipoDownload or'periodo'
