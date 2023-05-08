@@ -1,39 +1,12 @@
 from bs4 import BeautifulSoup
 from pathlib import Path
-import requests, re
+import requests, re, conf
 import datetime as dt
 # módulo tqdm para barra de progresso não é obrigatório
 try: from tqdm import tqdm
 except ImportError: tqdm = None
 
-################################# VARIAVEIS GLOBAIS ###################################
-class Globals():
-  # nome de meses e respectivos números para serem parseados. Modulo Datetime não suporta português
-  meses = {'Janeiro': 1,
-          'Fevereiro': 2,
-          'Março': 3,
-          'Abril': 4,
-          'Maio': 5,
-          'Junho': 6,
-          'Julho': 7,
-          'Agosto': 8,
-          'Setembro': 9,
-          'Outubro': 10,
-          'Novembro': 11,
-          'Dezembro': 12
-          }
-  urlAnos = 'http://www.ioerj.com.br/portal/modules/conteudoonline/do_seleciona_data.php'
-  urlDiaBase = 'http://www.ioerj.com.br/portal/modules/conteudoonline/'
-  urlUltima = 'http://www.ioerj.com.br/portal/modules/conteudoonline/do_ultima_edicao.php'
-  headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0' }
-  cadernosDisponiveis = ['Parte I (Poder Executivo)', 'Parte IB - (Tribunal de Contas)', 'Parte II (Poder Legislativo)', 'Parte IV (Municipalidades)', 'Parte V (Publicações a Pedido)']
-  hoje = dt.date.today()
-  
-  # pasta padrão para salvar arquivos
-  defaultDir = Path(Path.home(), 'Documents', 'IOERJ')
-
-gl = Globals()
-
+gl = conf.Globals()
 
 ######################################## RECURSOS DE DOWNLOAD DO SITE IOERJ ##############################################
 
@@ -53,10 +26,10 @@ def defSoup(url, parser='html.parser'):
 def savePdf(urlPdf, conf):
   
   # diretório em que o pdf será salvo. Criar caso não exista
-  fullDir = Path(conf.workDir, str(conf.dataAtual.year), str(conf.dataAtual.month))
+  fullDir = Path(conf['diretorio'], str(conf['dataAtual'].year), str(conf['dataAtual'].month))
   Path.mkdir(fullDir, exist_ok=True, parents=True)
   # Nome completo do arquivo
-  nomeFull = Path(fullDir, '%s_%s.pdf'%(conf.dataAtual.day, conf.caderno))
+  nomeFull = Path(fullDir, '%s_%s.pdf'%(conf['dataAtual'].day, conf['caderno']))
 
   # download do pdf completo do caderno
   print('Baixando %s'%nomeFull)
@@ -76,8 +49,8 @@ def savePdf(urlPdf, conf):
       f.write(res.content)
 
   # escreve uma cópia extra para DO de hoje
-  if conf.tipoDownload == 'hoje':
-    nomeFull = Path(conf['workDir'], 'Hoje_%s.pdf'%conf['caderno'])
+  if conf['tipoDownload'] == 'hoje':
+    nomeFull = Path(conf['diretorio'], 'Hoje_%s.pdf'%conf['caderno'])
     with open(nomeFull, 'wb') as f:
       f.write(res.content)
 
@@ -123,7 +96,7 @@ class CadernoDL():
     urlPdf = gl.urlDiaBase + 'mostra_edicao.php?k=' + key
 
     # nome que o arquivo terá
-    conf.caderno = self.nome
+    conf['caderno'] = self.nome
     savePdf(urlPdf, conf)
 
 
@@ -134,7 +107,7 @@ def downloadDia(url, conf):
   htmlDia = defSoup(url)
   htmlDia.find(id='xo-content').find_all('a')
 
-  for tipoCaderno in conf.cadernos:
+  for tipoCaderno in conf['cadernos']:
     # contagem de edição para cada parte do caderno
     extra = 0
     # links no conteudo central da página, que são os cadernos
@@ -142,7 +115,7 @@ def downloadDia(url, conf):
       # verificar se o link dentro da página é para um dos cadernos configurados
       if link.text == tipoCaderno:
         # indexar dados do elemento do caderno
-        caderno = CadernoDL(link, conf.dataAtual)
+        caderno = CadernoDL(link, conf['dataAtual'])
         # verificação e contagem de edições extra
         if caderno.extra:
           extra += 1
@@ -152,17 +125,17 @@ def downloadDia(url, conf):
 
 #########################
 
-def executarDO(conf, dataInicio=(gl.hoje - dt.timedelta(days=7)), dataFim=gl.hoje):
+def executarDO(conf: dict()):
 
-  conf.dataAtual = gl.hoje
+  conf['dataAtual'] = gl.hoje
 
-  if conf.tipoDownload == 'hoje':
+  if conf['tipoDownload'] == 'hoje':
     pagUltima = defSoup(gl.urlUltima)
     # ao ir nesse endereço, o IOERJ mostra uma pagina redirecionadora que contém um link para clicar direto
     urlHoje = gl.urlDiaBase + pagUltima.find('a')['href']
     downloadDia(urlHoje, conf)
     
-  if conf.tipoDownload == 'periodo':
+  if conf['tipoDownload'] == 'periodo':
     print('Buscando dias de DO.')
     # essa página precisa ser parseada com LXML. Recorta pro ID do conteudo principal
     html = defSoup(gl.urlAnos, parser='html.parser').find(id='xo-page')
@@ -173,7 +146,7 @@ def executarDO(conf, dataInicio=(gl.hoje - dt.timedelta(days=7)), dataFim=gl.hoj
         self.url = url
 
       def download(self, conf):
-        conf.dataAtual = self.data
+        conf['dataAtual'] = self.data
         downloadDia(self.url, conf)
 
     # busca campos "Ano de 20XX" para indicar anos disponíveis e inclui numa lista
@@ -205,26 +178,11 @@ def executarDO(conf, dataInicio=(gl.hoje - dt.timedelta(days=7)), dataFim=gl.hoj
           #linksDias.append( LinkDO(urlDia, diaNum, mesNum, ano))
           link = LinkDO(urlDia, diaNum, mesNum, ano)
           # verificar se está dentro do período solicitado
-          if link.data >= dataInicio and link.data <= dataFim:
+          if link.data >= conf['dataInicio'] and link.data <= conf['dataFim']:
             linksDias.append(link)
           
     # após formar lista, iterar e baixar links de DOs
     print('%s dias selecionados para baixar.'%len(linksDias))
     for linkDia in linksDias:
       linkDia.download(conf)
-
-
-############################################## DEFINIÇÕES ######################################################
-
-class Conf():
-  def __init__(self, tipoDownload, workDir, cadernos):
-    
-    # dataDownload = ['hoje', 'periodo']
-    self.tipoDownload = tipoDownload or'periodo'
-
-    # diretório para salvar pastas (padrão: pasta atual do __main__ ./ )
-    self.workDir = workDir or gl.defaultDir
-
-    #self.cadernosDisponiveis = ['Parte I (Poder Executivo)', 'Parte IB - (Tribunal de Contas)', 'Parte II (Poder Legislativo)', 'Parte IV (Municipalidades)', 'Parte V (Publicações a Pedido)']
-    self.cadernos = cadernos or ['Parte I (Poder Executivo)']
 

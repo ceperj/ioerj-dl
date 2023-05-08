@@ -1,7 +1,7 @@
-import ioerj_dl as id, datetime as dt
+import ioerj_dl as id, datetime as dt, conf
 from prompt_toolkit.shortcuts import button_dialog, input_dialog, checkboxlist_dialog
 
-gl = id.Globals()
+gl = conf.Globals()
 
 def main():
 
@@ -40,8 +40,14 @@ def main():
       ok_text="Começar",
       cancel_text="Cancelar" ).run()
 
-    conf = id.Conf(tipoDownload, diretorio, cadernos)
-
     fData = lambda x: dt.date(int(x.split('/')[2]), int(x.split('/')[1]), int(x.split('/')[0])) or None
-    id.executarDO(conf, dataInicio = fData(inicio), dataFim = fData(fim))
+    conf = {
+            'tipoDownload': tipoDownload,
+            'diretorio': diretorio,
+            'cadernos': cadernos,
+            'dataInicio': fData(inicio) or None,
+            'dataFim': fData(fim) or None
+    }
+
+    id.executarDO(conf)
   
