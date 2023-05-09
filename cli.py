@@ -27,6 +27,7 @@ def main():
     values = cad).run()
   
   if tipoDownload == 'periodo':
+    # função anonima de parsear data para string
     fData = lambda x: x.strftime('%d/%m/%Y')
     inicio = input_dialog(
       title='Data de início da busca de DOs',
@@ -39,14 +40,21 @@ def main():
       default = fData(gl.hoje),
       ok_text="Começar",
       cancel_text="Cancelar" ).run()
+    
+    # formatação de data DD/MM/YYYY de volta para datetime
+    fData = lambda x: dt.date(int(x.split('/')[2]), int(x.split('/')[1]), int(x.split('/')[0]))
+    inicio = fData(inicio)
+    fim = fData(fim)
+  else:
+    fim = None
+    inicio = None
 
-    fData = lambda x: dt.date(int(x.split('/')[2]), int(x.split('/')[1]), int(x.split('/')[0])) or None
     conf = {
             'tipoDownload': tipoDownload,
             'diretorio': diretorio,
             'cadernos': cadernos,
-            'dataInicio': fData(inicio) or None,
-            'dataFim': fData(fim) or None
+            'dataInicio': inicio,
+            'dataFim': fim
     }
 
     id.executarDO(conf)

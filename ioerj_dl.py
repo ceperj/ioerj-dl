@@ -50,7 +50,7 @@ def savePdf(urlPdf, conf):
 
   # escreve uma cópia extra para DO de hoje
   if conf['tipoDownload'] == 'hoje':
-    nomeFull = Path(conf['diretorio'], 'Hoje_%s.pdf'%conf['caderno'])
+    nomeFull = Path(conf['diretorio'], 'IOERJ_Hoje_%s.pdf'%conf['caderno'])
     with open(nomeFull, 'wb') as f:
       f.write(res.content)
 
