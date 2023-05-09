@@ -27,17 +27,27 @@ def main():
     values = cad).run()
   
   if tipoDownload == 'periodo':
-    # função anonima de parsear data para string
+    # função anonima de parsear data para string DD/MM/YYYY
     fData = lambda x: x.strftime('%d/%m/%Y')
+
+    # data inicial padrão
+    inicioPadrao = fData( gl.hoje - dt.timedelta(days=7))
     inicio = input_dialog(
       title='Data de início da busca de DOs',
       text='Formato DD/MM/AAAA',
-      default = fData(gl.hoje - dt.timedelta(days=7)),
+      default = fData(inicioPadrao),
       cancel_text="Cancelar" ).run()
+    
+    # se data de inicio for modificada, manter a mesma no fim para otimizar buscas de datas únicas
+    if inicio != inicioPadrao:
+      fimPadrao = inicio
+    else:
+      fimPadrao = fData(gl.hoje)
+    
     fim = input_dialog(
       title = 'Data de fim da busca de DOs',
       text = 'Formato DD/MM/AAAA',
-      default = fData(gl.hoje),
+      default = fimPadrao,
       ok_text="Começar",
       cancel_text="Cancelar" ).run()
     
@@ -45,6 +55,7 @@ def main():
     fData = lambda x: dt.date(int(x.split('/')[2]), int(x.split('/')[1]), int(x.split('/')[0]))
     inicio = fData(inicio)
     fim = fData(fim)
+    
   else:
     fim = None
     inicio = None
