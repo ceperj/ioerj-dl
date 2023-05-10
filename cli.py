@@ -18,7 +18,7 @@ def main():
     title = 'Diretório de destino dos arquivos de DO',
     text =  'Navegar com setas e enter (padrão: pasta Documentos)',
     cancel_text = 'Cancelar',
-    default = str(gl.defaultDir)).run()
+    default = str(df.defaultDir)).run()
   
   cad = [(c, c) for c in gl.cadernosDisponiveis]
   cadernos = checkboxlist_dialog(

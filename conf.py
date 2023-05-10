@@ -23,8 +23,9 @@ class Globals:
   headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101 Firefox/102.0' }
   cadernosDisponiveis = ['Parte I (Poder Executivo)', 'Parte IB - (Tribunal de Contas)', 'Parte II (Poder Legislativo)', 'Parte IV (Municipalidades)', 'Parte V (Publicações a Pedido)']
   hoje = dt.date.today()
-  defaultDir = Path(Path.home(), 'Documents', 'IOERJ')
 
 class Defaults:
+  tipoDownload = 'periodo'
+  defaultDir = Path(Path.home(), 'Documents', 'IOERJ')
   dir = Path(Path.home(), 'Documents', 'IOERJ')
   inicio = (Globals.hoje - dt.timedelta(days=7))
