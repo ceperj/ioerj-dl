@@ -10,7 +10,7 @@ def main():
     title= 'Selecione o periodo a ser baixado',
     text = 'Último DO ou multiplos DOs',
     buttons=[
-        ('Hoje', 'hoje'),
+        ('Último', 'hoje'),
         ('Período', 'periodo'),
     ]).run()
   
