@@ -26,6 +26,7 @@ class Globals:
 
 class Defaults:
   tipoDownload = 'periodo'
-  defaultDir = Path(Path.home(), 'Documents', 'IOERJ')
-  dir = Path(Path.home(), 'Documents', 'IOERJ')
+  workDir = Path(Path.home(), 'Documents', 'IOERJ')
   inicio = (Globals.hoje - dt.timedelta(days=7))
+  fim = Globals.hoje
+  cadernos = ['Parte I (Poder Executivo)']
