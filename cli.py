@@ -1,7 +1,8 @@
 import ioerj_dl as id, datetime as dt, conf
 from prompt_toolkit.shortcuts import button_dialog, input_dialog, checkboxlist_dialog
 
-gl = conf.Globals()
+gl = conf.Globals
+df = conf.Defaults
 
 def main():
 
@@ -31,11 +32,11 @@ def main():
     fData = lambda x: x.strftime('%d/%m/%Y')
 
     # data inicial padrão
-    inicioPadrao = fData( gl.hoje - dt.timedelta(days=7))
+    inicioPadrao = fData(df.inicio)
     inicio = input_dialog(
       title='Data de início da busca de DOs',
       text='Formato DD/MM/AAAA',
-      default = fData(inicioPadrao),
+      default = inicioPadrao,
       cancel_text="Cancelar" ).run()
     
     # se data de inicio for modificada, manter a mesma no fim para otimizar buscas de datas únicas
@@ -60,13 +61,14 @@ def main():
     fim = None
     inicio = None
 
-    conf = {
-            'tipoDownload': tipoDownload,
-            'diretorio': diretorio,
-            'cadernos': cadernos,
-            'dataInicio': inicio,
-            'dataFim': fim
-    }
+  conf = {
+          'tipoDownload': tipoDownload,
+          'diretorio': diretorio,
+          'cadernos': cadernos,
+          'dataInicio': inicio,
+          'dataFim': fim
+  }
 
-    id.executarDO(conf)
+  
+  id.executarDO(conf)
   

@@ -24,4 +24,7 @@ class Globals:
   cadernosDisponiveis = ['Parte I (Poder Executivo)', 'Parte IB - (Tribunal de Contas)', 'Parte II (Poder Legislativo)', 'Parte IV (Municipalidades)', 'Parte V (Publicações a Pedido)']
   hoje = dt.date.today()
   defaultDir = Path(Path.home(), 'Documents', 'IOERJ')
-  
+
+class Defaults:
+  dir = Path(Path.home(), 'Documents', 'IOERJ')
+  inicio = (Globals.hoje - dt.timedelta(days=7))
