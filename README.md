@@ -10,13 +10,13 @@ Documentos são baixados por padrão na pasta `<Usuário>/Documents/IOERJ` e org
 
 ---
 ### Argumentos de linha de comando (na pasta do projeto ou __main__.py):
-`` --modo``, ``--diretorio``, ``--inicio``, ``--padrao``
+`` --modo``, ``--diretorio``, ``--inicio``, ``--fim``
 
 
 ---
 ### Módulos
 
-**Requer** módulos: **bs4** (BeaufitulSoup4), **requests**. Módulos opcionais para linha de comando interativa CLI: **prompt-toolkit** e **tqdm**. Todos estão listados *requirements.txt*.
+**Requer** módulos: **bs4** (BeaufitulSoup4), **requests**. Módulos opcionais para linha de comando interativa CLI: **prompt-toolkit** e **tqdm**. Todos estão listados em *requirements.txt*.
 
 ---
 ### Problemas conhecidos:
