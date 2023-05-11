@@ -7,6 +7,7 @@ Documentos são baixados por padrão na pasta `<Usuário>/Documents/IOERJ` e org
 - Baixar período de datas selecionadas
 - Baixar diário do dia (ideal para scripts rotineiros)
 - Selecionar cadernos
+- Interface baseada em CLI (prompt-toolkit)
 
 ---
 ### Argumentos de linha de comando (na pasta do projeto ou __main__.py):
