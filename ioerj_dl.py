@@ -136,7 +136,7 @@ def executarDO(conf: dict()):
     urlHoje = gl.urlDiaBase + pagUltima.find('a')['href']
     downloadDia(urlHoje, conf)
     
-  if conf['tipoDownload'] == 'periodo':
+  elif conf['tipoDownload'] == 'periodo':
     print('Buscando dias de DO.')
     # essa página precisa ser parseada com LXML. Recorta pro ID do conteudo principal
     html = defSoup(gl.urlAnos, parser='html.parser').find(id='xo-page')
