@@ -33,11 +33,16 @@ def savePdf(urlPdf, conf):
   # diretório em que o pdf será salvo. Criar caso não exista
   fullDir = Path(conf['diretorio'], str(conf['dataAtual'].year), str(conf['dataAtual'].month))
   Path.mkdir(fullDir, exist_ok=True, parents=True)
-  # Nome completo do arquivo
-  nomeFull = Path(fullDir, '%s_%s.pdf' % (conf['dataAtual'].day, conf['caderno']))
+  # Nome do arquivo e caminho absoluto
+  nomeArq = '%s_%s.pdf' % (conf['dataAtual'].day, conf['caderno'])
+  nomeFull = Path(fullDir, nomeArq)
 
-  # download do pdf completo do caderno
-  print('Baixando %s' % nomeFull)
+  # exibir em interface GUI se estiver presente (modulo Pyforms)
+  try:
+    conf['labelGUI'].value = 'Baixando %s' % nomeArq
+  except KeyError:
+    print('Baixando %s' % nomeArq)
+  
   res = requests.get(urlPdf, stream=True, headers=gl.headers)
 
   # escreve DO na pasta definida
@@ -192,5 +197,19 @@ def executarDO(conf: dict()):
 
     # após formar lista, iterar e baixar links de DOs
     print('%s dias selecionados para baixar.' % len(linksDias))
+    # retornar numero de DOs a baixar para barra de progresso, se houver Pyforms
+    try:
+      d = 0
+      conf['barraProgresso'].max = len(linksDias)
+    except KeyError:
+      pass
+
     for linkDia in linksDias:
+      # contar em barra de progresso se ela estiver presente (modulo Pyforms)
+      try:
+        conf['barraProgresso'].value = d
+        d += 1
+      except KeyError:
+        pass
+      
       linkDia.download(conf)

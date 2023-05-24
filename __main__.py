@@ -1,4 +1,4 @@
-import cli, conf, argparse, sys, ioerj_dl
+import gui, cli, conf, argparse, sys, ioerj_dl
 
 parser = argparse.ArgumentParser(description='IOERJ-DL')
 df = conf.Defaults
@@ -13,11 +13,12 @@ parser.add_argument('--fim', type=str, default=df.fim,
                     help="DD/MM/YYYY = (7 dias atras)\nData de fim ao escolher baixar no modo 'periodo'.")
 # args de Cadernos ainda a ser implementado, padronizado apenas para Parte I por enquanto.
 
-# se nenhum argumento foi passado, usar o CLI(prompt-toolkit) ou GUI
+# se nenhum argumento foi passado, usar o GUI (Pyforms) ou CLI(prompt-toolkit)
 if len(sys.argv) == 1:
-  cli.main()
+  gui.main()
+  #cli.main()
 
-# se agumentos forem passados, 
+# se agumentos foram passados, 
 else:
   args = parser.parse_args()
   config = {
