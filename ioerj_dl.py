@@ -1,10 +1,14 @@
 from bs4 import BeautifulSoup
 from pathlib import Path
-import requests, re, conf
+import requests
+import re
+import conf
 import datetime as dt
 # módulo tqdm para barra de progresso não é obrigatório
-try: from tqdm import tqdm
-except ImportError: tqdm = None
+try:
+  from tqdm import tqdm
+except ImportError:
+  tqdm = None
 
 gl = conf.Globals()
 
@@ -23,16 +27,17 @@ def defSoup(url, parser='html.parser'):
 
 #########################
 
+
 def savePdf(urlPdf, conf):
-  
+
   # diretório em que o pdf será salvo. Criar caso não exista
   fullDir = Path(conf['diretorio'], str(conf['dataAtual'].year), str(conf['dataAtual'].month))
   Path.mkdir(fullDir, exist_ok=True, parents=True)
   # Nome completo do arquivo
-  nomeFull = Path(fullDir, '%s_%s.pdf'%(conf['dataAtual'].day, conf['caderno']))
+  nomeFull = Path(fullDir, '%s_%s.pdf' % (conf['dataAtual'].day, conf['caderno']))
 
   # download do pdf completo do caderno
-  print('Baixando %s'%nomeFull)
+  print('Baixando %s' % nomeFull)
   res = requests.get(urlPdf, stream=True, headers=gl.headers)
 
   # escreve DO na pasta definida
@@ -44,13 +49,13 @@ def savePdf(urlPdf, conf):
       for chunk in tqdm(res.iter_content(32*1024), total=tamanhoArq, unit='B', unit_scale=True):
         if chunk:
           f.write(chunk)
-    
+
     else:
       f.write(res.content)
 
   # escreve uma cópia extra para DO de hoje
   if conf['tipoDownload'] == 'hoje':
-    nomeFull = Path(conf['diretorio'], 'IOERJ_Hoje_%s.pdf'%conf['caderno'])
+    nomeFull = Path(conf['diretorio'], 'IOERJ_Hoje_%s.pdf' % conf['caderno'])
     res = requests.get(urlPdf, stream=True, headers=gl.headers)
     with open(nomeFull, 'wb') as f:
       f.write(res.content)
@@ -58,6 +63,8 @@ def savePdf(urlPdf, conf):
 #########################
 
 # classe vai receber o elemento HTML(do beautiful soup) para processar nome e se é edição extra
+
+
 class CadernoDL():
   def __init__(self, element, data):
     self.element = element
@@ -81,12 +88,12 @@ class CadernoDL():
       self.caderno = self.caderno + ' ' + str(num)
     return self
 
-  def download(self, conf):    
+  def download(self, conf):
     htmlDO = defSoup(self.url)
     # busca link do pdf completo dentro do visualizador do IOERJ
     scriptLink = htmlDO.find(id='scaleSelectContainer').find('script').text
     # retorna chave base do PDF, buscando o que tem dentro de aspas
-    key = re.findall('"(.*?)"',scriptLink)[0]
+    key = re.findall('"(.*?)"', scriptLink)[0]
     # insere o P dentro da segunda parte da chave, que irá apontar para o PDF com todas as páginas do DO
     # ex: C88CBE18-A446-4060-9882-DF929C0468EA >> C88CBE18-A44P6-4060-9882-DF929C0468EA
     keyArr = key.split('-')
@@ -121,10 +128,11 @@ def downloadDia(url, conf):
         if caderno.extra:
           extra += 1
           caderno = caderno.numerarExtra(extra)
-        
+
         caderno.download(conf)
 
 #########################
+
 
 def executarDO(conf: dict()):
 
@@ -135,7 +143,7 @@ def executarDO(conf: dict()):
     # ao ir nesse endereço, o IOERJ mostra uma pagina redirecionadora que contém um link para clicar direto
     urlHoje = gl.urlDiaBase + pagUltima.find('a')['href']
     downloadDia(urlHoje, conf)
-    
+
   elif conf['tipoDownload'] == 'periodo':
     print('Buscando dias de DO.')
     # essa página precisa ser parseada com LXML. Recorta pro ID do conteudo principal
@@ -167,23 +175,22 @@ def executarDO(conf: dict()):
       htmlMeses = htmlCalAno[indexAno].find_all(class_='calendario')
       for mes in htmlMeses:
         # encontra o elemento com o nome do mês, e busca número do mês via dicionário
-        mesNome = mes.find(class_='mes').text.replace('\n','')
+        mesNome = mes.find(class_='mes').text.replace('\n', '')
         mesNum = gl.meses[mesNome]
         diasUteis = mes.find_all(class_='dialink')
 
         for dia in diasUteis:
           # extrair texto puro do número do dia, remove as quebras de linha do HTML
-          diaNum = dia.text.replace('\n','')
+          diaNum = dia.text.replace('\n', '')
           urlDia = gl.urlDiaBase + dia.find('a')['href']
-          # insere em lista de datas disponíveis 
-          #linksDias.append( LinkDO(urlDia, diaNum, mesNum, ano))
+          # insere em lista de datas disponíveis
+          # linksDias.append( LinkDO(urlDia, diaNum, mesNum, ano))
           link = LinkDO(urlDia, diaNum, mesNum, ano)
           # verificar se está dentro do período solicitado
           if link.data >= conf['dataInicio'] and link.data <= conf['dataFim']:
             linksDias.append(link)
-          
+
     # após formar lista, iterar e baixar links de DOs
-    print('%s dias selecionados para baixar.'%len(linksDias))
+    print('%s dias selecionados para baixar.' % len(linksDias))
     for linkDia in linksDias:
       linkDia.download(conf)
-
