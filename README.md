@@ -17,9 +17,10 @@ Documentos são baixados por padrão na pasta `<Usuário>/Documents/IOERJ` e org
 ---
 ### Módulos
 
-**Requer** módulos: **bs4** (BeaufitulSoup4), **requests**. Módulos opcionais para linha de comando interativa CLI: **prompt-toolkit** e **tqdm**. Todos estão listados em *requirements.txt*.
+**Requer** módulos: **bs4** (BeaufitulSoup4), **requests**. Módulos opcionais para modos em CLI: **prompt-toolkit** e **tqdm**. Opcional para GUI: **PyForms** e **PyForms-GUI**. Todos estão listados em *requirements.txt*.
 
 ---
 ### Problemas conhecidos:
 - Edições suplementares não são suportadas (exemplo: [05 jan 2023](http://www.ioerj.com.br/portal/modules/conteudoonline/do_seleciona_edicao.php?data=MjAyMzAxMDU=), Parte I)
 - Sem fallback ao escolher "cancelar" no CLI
+- Executar PyInstaller na aplicação resulta em erro devido a um problema no PyQt5 (dependência do PyForms)
